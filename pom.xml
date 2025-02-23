@@ -1,58 +1,102 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="http://maven.apache.org/POM/4.0.0"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <artifactId>twittered</artifactId>
+End
+Delete
+Lose
+Void
+Stop
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <configuration>
-          <append>true</append>
-          <excludes>
-            <exclude>target/**</exclude>
-          </excludes>
-          <output>file</output>
-          <skip>${maven.test.skip}</skip>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-            <id>jacoco-initialize</id>
-          </execution>
-          <execution>
-            <goals>
-              <goal>report</goal>
-            </goals>
-            <id>jacoco-site</id>
-            <phase>verify</phase>
-          </execution>
-        </executions>
-        <groupId>org.jacoco</groupId>
-        <version>0.8.6</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <groupId>org.apache.maven.plugins</groupId>
-        <version>3.0.0-M4</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-            <id>attach-sources</id>
-          </execution>
-        </executions>
-        <groupId>org.apache.maven.plugins</groupId>
-        <version>2.2.1</version>
-      </plugin>
-      <plugin>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
           <source>8</source>
