@@ -1,85 +1,101 @@
-This project is a JAVA library which allows you to consume the Twitter API.
+End
+Delete
+Void
+Stop
+Close
 
-[![v2](https://img.shields.io/endpoint?url=https%3A%2F%2Ftwbadges.glitch.me%2Fbadges%2Fv2)](https://developer.twitter.com/en/docs/twitter-api)
 
-[![Standard](https://img.shields.io/static/v1?label=Twitter%20API&message=v1.1&color=794BC4&style=flat&logo=Twitter)](https://developer.twitter.com/en/docs/api-reference-index)
 
-[![Premium](https://img.shields.io/static/v1?label=Twitter%20API&message=Premium&color=794BC4&style=flat&logo=Twitter)](https://developer.twitter.com/en/docs/tweets/search/api-reference/premium-search)
 
-### Configuration
 
-![Maven Central](https://img.shields.io/maven-central/v/io.github.redouane59.twitter/twittered)
 
-In your pom.xml, add the following dependency and replace `VERSION` with the version you wish:
 
-```xml
-<dependency>
-  <groupId>io.github.redouane59.twitter</groupId>
-  <artifactId>twittered</artifactId>
-  <version>VERSION</version>
-</dependency>
-```
 
-If you are using Gradle Kotlin DSL, make sure you have MavenCentral among the available repositories:
-```kotlin
-repositories {
-    mavenCentral()
-    // [...]
-}
-```
-Then add the following line to your `dependencies` block:
 
-```kotlin
-implementation("io.github.redouane59.twitter:twittered:VERSION")
-```
 
-To be able to see library logs, also add sl4j references :
 
-```xml
-<dependency>
-  <groupId>org.slf4j</groupId>
-  <artifactId>slf4j-api</artifactId>
-  <version>1.7.30</version>
-</dependency>
-<dependency>
-  <groupId>org.slf4j</groupId>
-  <artifactId>slf4j-simple</artifactId>
-  <version>1.7.30</version>
-</dependency>
-``` 
 
-In order to use your own developer credentials, you have several options :
 
-#### Using a json file
 
-File example :
 
-```json
-{
-  "apiKey": "xxx",
-  "apiSecretKey": "xxx",
-  "accessToken": "xxx",
-  "accessTokenSecret": "xxx"
-}
-```
 
-##### With program argument
 
-Pass through java argument your file path like `-Dtwitter.credentials.file.path=/your/path/to/json`
-. Then instantiate the client like
 
-```java
-TwitterClient client = new TwitterClient();
-```
 
-or
 
-##### Using deserialization in your code
 
-```java
-TwitterClient twitterClient = new TwitterClient(TwitterClient.OBJECT_MAPPER
-                                                    .readValue(new File("/your/path/to/json"), TwitterCredentials.class));
-``` 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #### With hard-coded values
 
