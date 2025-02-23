@@ -1,121 +1,113 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="http://maven.apache.org/POM/4.0.0"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <artifactId>twittered</artifactId>
+End
+Stop
+Delete
+Vpid
+Close
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <configuration>
-          <append>true</append>
-          <excludes>
-            <exclude>target/**</exclude>
-          </excludes>
-          <output>file</output>
-          <skip>${maven.test.skip}</skip>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-            <id>jacoco-initialize</id>
-          </execution>
-          <execution>
-            <goals>
-              <goal>report</goal>
-            </goals>
-            <id>jacoco-site</id>
-            <phase>verify</phase>
-          </execution>
-        </executions>
-        <groupId>org.jacoco</groupId>
-        <version>0.8.6</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <groupId>org.apache.maven.plugins</groupId>
-        <version>3.0.0-M4</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-            <id>attach-sources</id>
-          </execution>
-        </executions>
-        <groupId>org.apache.maven.plugins</groupId>
-        <version>2.2.1</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <source>8</source>
-        </configuration>
-        <executions>
-          <execution>
-            <configuration>
-              <failOnError>false</failOnError>
-              <additionalOptions>-Xdoclint:none</additionalOptions>
-            </configuration>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <id>attach-javadocs</id>
-          </execution>
-        </executions>
-        <groupId>org.apache.maven.plugins</groupId>
-        <version>3.2.0</version>
-      </plugin>
-    </plugins>
-  </build>
-  <dependencies>
-    <dependency>
-      <artifactId>sonar-packaging-maven-plugin</artifactId>
-      <groupId>org.codehaus.sonar</groupId>
-      <type>maven-plugin</type>
-      <version>1.13</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <artifactId>jackson-databind</artifactId>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <version>2.13.4.2</version>
-    </dependency>
-    <dependency>
-      <artifactId>jackson-datatype-jsr310</artifactId>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <version>2.13.2</version>
-    </dependency>
-    <dependency>
-      <artifactId>jackson-dataformat-yaml</artifactId>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <version>2.13.2</version>
-    </dependency>
-    <dependency>
-      <artifactId>lombok</artifactId>
-      <groupId>org.projectlombok</groupId>
-      <scope>provided</scope>
-      <version>1.18.22</version>
-    </dependency>
-    <dependency>
-      <artifactId>scribejava-apis</artifactId>
-      <exclusions>
-        <!-- we include our own version -->
-        <exclusion>
-          <artifactId>jackson-databind</artifactId>
-          <groupId>com.fasterxml.jackson.core</groupId>
-        </exclusion>
-      </exclusions>
-      <groupId>com.github.scribejava</groupId>
-      <version>8.3.1</version>
-    </dependency>
-    <dependency>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <artifactId>slf4j-api</artifactId>
       <groupId>org.slf4j</groupId>
       <version>1.7.36</version>
