@@ -1,510 +1,109 @@
-package io.github.redouane59.twitter;
-
-import static io.github.redouane59.twitter.dto.endpoints.AdditionalParameters.MAX_RESULTS;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.github.scribejava.apis.TwitterApi;
-import com.github.scribejava.core.builder.ServiceBuilder;
-import com.github.scribejava.core.httpclient.HttpClient;
-import com.github.scribejava.core.httpclient.HttpClientConfig;
-import com.github.scribejava.core.model.Response;
-import com.github.scribejava.core.model.Verb;
-import com.github.scribejava.core.oauth.OAuth10aService;
-import io.github.redouane59.RelationType;
-import io.github.redouane59.twitter.dto.collections.CollectionsResponse;
-import io.github.redouane59.twitter.dto.collections.TimeLineOrder;
-import io.github.redouane59.twitter.dto.dm.DirectMessage;
-import io.github.redouane59.twitter.dto.dm.DmParameters;
-import io.github.redouane59.twitter.dto.dm.DmParameters.DmMessage;
-import io.github.redouane59.twitter.dto.dm.PostDmResponse;
-import io.github.redouane59.twitter.dto.dm.deprecatedV1.DmListAnswer;
-import io.github.redouane59.twitter.dto.endpoints.AdditionalParameters;
-import io.github.redouane59.twitter.dto.getrelationship.IdList;
-import io.github.redouane59.twitter.dto.getrelationship.RelationshipObjectResponse;
-import io.github.redouane59.twitter.dto.list.TwitterList;
-import io.github.redouane59.twitter.dto.list.TwitterList.TwitterListData;
-import io.github.redouane59.twitter.dto.list.TwitterListList;
-import io.github.redouane59.twitter.dto.list.TwitterListMember.TwitterListMemberData;
-import io.github.redouane59.twitter.dto.others.BearerToken;
-import io.github.redouane59.twitter.dto.others.BlockResponse;
-import io.github.redouane59.twitter.dto.others.RateLimitStatus;
-import io.github.redouane59.twitter.dto.others.RequestToken;
-import io.github.redouane59.twitter.dto.rules.FilteredStreamRulePredicate;
-import io.github.redouane59.twitter.dto.space.Space;
-import io.github.redouane59.twitter.dto.space.SpaceList;
-import io.github.redouane59.twitter.dto.space.SpaceState;
-import io.github.redouane59.twitter.dto.stream.StreamRules;
-import io.github.redouane59.twitter.dto.stream.StreamRules.StreamMeta;
-import io.github.redouane59.twitter.dto.stream.StreamRules.StreamRule;
-import io.github.redouane59.twitter.dto.tweet.*;
-import io.github.redouane59.twitter.dto.tweet.HiddenResponse.HiddenData;
-import io.github.redouane59.twitter.dto.tweet.TweetList.TweetMeta;
-import io.github.redouane59.twitter.dto.user.FollowBody;
-import io.github.redouane59.twitter.dto.user.User;
-import io.github.redouane59.twitter.dto.user.UserActionResponse;
-import io.github.redouane59.twitter.dto.user.UserList;
-import io.github.redouane59.twitter.dto.user.UserList.UserMeta;
-import io.github.redouane59.twitter.dto.user.UserV2;
-import io.github.redouane59.twitter.dto.user.UserV2.UserData;
-import io.github.redouane59.twitter.helpers.AbstractRequestHelper;
-import io.github.redouane59.twitter.helpers.ConverterHelper;
-import io.github.redouane59.twitter.helpers.JsonHelper;
-import io.github.redouane59.twitter.helpers.RequestHelper;
-import io.github.redouane59.twitter.helpers.RequestHelperV2;
-import io.github.redouane59.twitter.helpers.URLHelper;
-import io.github.redouane59.twitter.signature.TwitterCredentials;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-
-@Getter
-@Setter
-@Slf4j
-public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitterClientArchive {
-
-  public static final String TWEET_FIELDS     = "tweet.fields";
-  public static final String
-                             ALL_TWEET_FIELDS =
-      "attachments,author_id,created_at,entities,geo,id,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,source,text,withheld,context_annotations,conversation_id,reply_settings";
-  public static final String EXPANSION        = "expansions";
-  public static final String
-                             ALL_EXPANSIONS   =
-      "author_id,entities.mentions.username,in_reply_to_user_id,referenced_tweets.id,referenced_tweets.id.author_id,attachments.media_keys,geo.place_id";
-  public static final String USER_FIELDS      = "user.fields";
-  public static final String ALL_USER_FIELDS  =
-      "id,created_at,entities,username,name,location,url,verified,profile_image_url,public_metrics,pinned_tweet_id,description,protected";
-  public static final String MEDIA_FIELD      = "media.fields";
-  public static final String ALL_MEDIA_FIELDS =
-      "duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width,alt_text,variants";
-  public static final String SPACE_FIELDS     = "space.fields";
-  public static final String
-                             ALL_SPACE_FIELDS =
-      "host_ids,created_at,creator_id,id,lang,invited_user_ids,participant_count,speaker_ids,started_at,state,title,updated_at,scheduled_start,is_ticketed";
-  public static final String PLACE_FIELDS     = "place.fields";
-  public static final String ALL_PLACE_FIELDS = "contained_within,country,country_code,full_name,geo,id,name,place_type";
-  public static final String POLL_FIELDS      = "poll.fields";
-  public static final String ALL_POLL_FIELDS  = "duration_minutes,end_datetime,id,options,voting_status";
-  public static final String LIST_FIELDS      = "list.fields";
-  public static final String
-                             ALL_LIST_FIELDS  = "created_at,follower_count,member_count,private,description,owner_id";
-
-  public static final  String             ALL_SPACE_EXPANSIONS                 = "invited_user_ids,speaker_ids,creator_id,host_ids";
-  public static final  String             DM_FIELDS                            = "dm_event.fields";
-  public static final  String
-                                          ALL_DM_FIELDS                        =
-      "id,text,event_type,created_at,dm_conversation_id,sender_id,participant_ids,referenced_tweets,attachments";
-  private static final String
-                                          ALL_DM_EXPANSIONS                    =
-      "attachments.media_keys,referenced_tweets.id,sender_id,participant_ids";
-  private static final String             QUERY                                = "query";
-  private static final String             CURSOR                               = "cursor";
-  private static final String             NEXT                                 = "next";
-  private static final String             PAGINATION_TOKEN                     = "pagination_token";
-  private static final String             PINNED_TWEET_ID                      = "pinned_tweet_id";
-  private static final String             BACKFILL_MINUTES                     = "backfill_minutes";
-  private static final String             DATA                                 = "data";
-  private static final String             DELETED                              = "deleted";
-  private static final String             IS_MEMBER                            = "is_member";
-  private static final String             FOLLOWING                            = "following";
-  private static final String             PINNED                               = "pinned";
-  private static final String[]           DEFAULT_VALID_CREDENTIALS_FILE_NAMES = {"test-twitter-credentials.json",
-                                                                                  "twitter-credentials.json"};
-  private              URLHelper          urlHelper                            = new URLHelper();
-  private              RequestHelper      requestHelperV1;
-  private              RequestHelperV2    requestHelperV2;
-  private              TwitterCredentials twitterCredentials;
-
-  public TwitterClient() {
-    this(getAuthentication());
-  }
-
-  public TwitterClient(TwitterCredentials credentials) {
-    this(credentials, new ServiceBuilder(credentials.getApiKey()).apiSecret(credentials.getApiSecretKey()));
-  }
-
-  public TwitterClient(TwitterCredentials credentials, HttpClient httpClient) {
-    this(credentials,
-         new ServiceBuilder(credentials.getApiKey()).apiSecret(credentials.getApiSecretKey()).httpClient(httpClient));
-  }
-
-  public TwitterClient(TwitterCredentials credentials, HttpClient httpClient, HttpClientConfig config) {
-    this(credentials, new ServiceBuilder(credentials.getApiKey()).apiSecret(credentials.getApiSecretKey())
-                                                                 .httpClient(httpClient).httpClientConfig(config));
-  }
-
-  public TwitterClient(TwitterCredentials credentials, ServiceBuilder serviceBuilder) {
-    this(credentials, serviceBuilder.apiKey(credentials.getApiKey()).apiSecret(credentials.getApiSecretKey())
-                                    .build(TwitterApi.instance()));
-  }
-
-  public TwitterClient(TwitterCredentials credentials, OAuth10aService service) {
-    twitterCredentials = credentials;
-    requestHelperV1    = new RequestHelper(credentials, service);
-    requestHelperV2    = new RequestHelperV2(credentials, service);
-  }
-
-  public static TwitterCredentials getAuthentication() {
-    String credentialPath = System.getProperty("twitter.credentials.file.path");
-    if (credentialPath != null) {
-      return getAuthentication(new File(credentialPath));
-    } else {
-      return getAuthentication(Paths.get(""));
-    }
-  }
-
-  public static TwitterCredentials getAuthentication(final Path pathToScan, final String... validNames) {
-    if (pathToScan.toFile().isFile()) {
-      return getAuthentication(pathToScan.toFile());
-    } else {
-      String[] namesToCheck = validNames != null && validNames.length > 0 ? validNames : DEFAULT_VALID_CREDENTIALS_FILE_NAMES;
-      for (Path currentPath = pathToScan; currentPath != null; currentPath = currentPath.getParent()) {
-        for (String name : namesToCheck) {
-          Path file = currentPath.resolve(name);
-          if (Files.isRegularFile(file)) {
-            return getAuthentication(file.toFile());
-          }
-        }
-      }
-    }
-    return null;
-  }
-
-  public static TwitterCredentials getAuthentication(File twitterCredentialsFile) {
-    try {
-      TwitterCredentials twitterCredentials = JsonHelper.OBJECT_MAPPER.readValue(twitterCredentialsFile, TwitterCredentials.class);
-      if (twitterCredentials.getAccessToken() == null) {
-        LOGGER.error("Access token is null in twitter-credentials.json");
-      }
-      if (twitterCredentials.getAccessTokenSecret() == null) {
-        LOGGER.error("Secret token is null in twitter-credentials.json");
-      }
-      if (twitterCredentials.getApiKey() == null) {
-        LOGGER.error("Consumer key is null in twitter-credentials.json");
-      }
-      if (twitterCredentials.getApiSecretKey() == null) {
-        LOGGER.error("Consumer secret is null in twitter-credentials.json");
-      }
-      return twitterCredentials;
-    } catch (Exception e) {
-      LOGGER.error("Twitter credentials json file error in path {}. Use program argument -Dtwitter.credentials.file.path=/my/path/to/json.",
-                   twitterCredentialsFile.getAbsolutePath(), e);
-      return null;
-    }
-  }
-
-  /**
-   * Define the default behavior when Twitter API limits are reached (default value is true)
-   *
-   * @param automaticRetry false will raise a LimitExceededException, true will wait and call the endpoint again once the limit is over
-   */
-  public void setAutomaticRetry(boolean automaticRetry) {
-    requestHelperV1.setAutomaticRetry(automaticRetry);
-    requestHelperV2.setAutomaticRetry(automaticRetry);
-  }
-
-  // can manage up to 5000 results / call . Max 15 calls / 15min ==> 75.000
-  // results max. / 15min
-  private List<String> getUserIdsByRelation(String url) {
-    String       cursor = "-1";
-    List<String> result = new ArrayList<>();
-    do {
-      String           urlWithCursor  = url + "&" + CURSOR + "=" + cursor;
-      Optional<IdList> idListResponse = getRequestHelper().getRequest(urlWithCursor, IdList.class);
-      if (!idListResponse.isPresent()) {
-        break;
-      }
-      result.addAll(idListResponse.get().getIds());
-      cursor = idListResponse.get().getNextCursor();
-    } while (!cursor.equals("0"));
-    return result;
-  }
-
-  @Override
-  public UserList getFollowers(String userId) {
-    return getFollowers(userId, AdditionalParameters.builder().maxResults(1000).build());
-  }
-
-  @Override
-  public UserList getFollowers(final String userId, final AdditionalParameters additionalParameters) {
-    String              url        = urlHelper.getFollowersUrl(userId);
-    Map<String, String> parameters = additionalParameters.getMapFromParameters();
-    parameters.put(USER_FIELDS, ALL_USER_FIELDS);
-    if (!additionalParameters.isRecursiveCall()) {
-      return getRequestHelper().getRequestWithParameters(url, parameters, UserList.class).orElseThrow(NoSuchElementException::new);
-    }
-    if (additionalParameters.getMaxResults() <= 0) {
-      parameters.put(MAX_RESULTS, String.valueOf(1000));
-    }
-    return getUsersRecursively(url, parameters, getRequestHelper());
-  }
-
-  @Override
-  public UserList getFollowing(String userId) {
-    return getFollowing(userId, AdditionalParameters.builder().maxResults(1000).build());
-  }
-
-  @Override
-  public UserList getFollowing(final String userId, final AdditionalParameters additionalParameters) {
-    String              url        = urlHelper.getFollowingUrl(userId);
-    Map<String, String> parameters = additionalParameters.getMapFromParameters();
-    parameters.put(USER_FIELDS, ALL_USER_FIELDS);
-    if (!additionalParameters.isRecursiveCall()) {
-      return getRequestHelper().getRequestWithParameters(url, parameters, UserList.class).orElseThrow(NoSuchElementException::new);
-    }
-    if (additionalParameters.getMaxResults() <= 0) {
-      parameters.put(MAX_RESULTS, String.valueOf(1000));
-    }
-    return getUsersRecursively(url, parameters, getRequestHelper());
-  }
-
-  @Override
-  public RelationType getRelationType(String userId1, String userId2) {
-    String url = urlHelper.getFriendshipUrl(userId1, userId2);
-    RelationshipObjectResponse relationshipDTO = getRequestHelper().getRequest(url, RelationshipObjectResponse.class)
-                                                                   .orElseThrow(NoSuchElementException::new);
-    boolean followedBy = relationshipDTO.getRelationship().getSource().isFollowedBy();
-    boolean following  = relationshipDTO.getRelationship().getSource().isFollowing();
-    if (followedBy && following) {
-      return RelationType.FRIENDS;
-    } else if (!followedBy && !following) {
-      return RelationType.NONE;
-    } else if (followedBy) {
-      return RelationType.FOLLOWER;
-    } else {
-      return RelationType.FOLLOWING;
-    }
-  }
-
-  @Override
-  public List<String> getFollowersIds(String userId) {
-    String url = urlHelper.getFollowersIdsUrl(userId);
-    return getUserIdsByRelation(url);
-  }
-
-  @Override
-  public List<String> getFollowingIds(String userId) {
-    String url = urlHelper.getFollowingIdsUrl(userId);
-    return getUserIdsByRelation(url);
-  }
-
-  @SneakyThrows
-  @Override
-  public UserActionResponse follow(String targetUserId) {
-    String url  = urlHelper.getFollowUrl(getUserIdFromAccessToken());
-    String body = JsonHelper.toJson(new FollowBody(targetUserId));
-    return requestHelperV1.postRequestWithBodyJson(url, new HashMap<>(), body, UserActionResponse.class)
-                          .orElseThrow(NoSuchElementException::new);
-  }
-
-  @Override
-  public UserActionResponse unfollow(String targetUserId) {
-    String url = urlHelper.getUnfollowUrl(getUserIdFromAccessToken(), targetUserId);
-    return getRequestHelper().makeRequest(Verb.DELETE, url, new HashMap<>(), null, true, UserActionResponse.class)
-                             .orElseThrow(NoSuchElementException::new);
-
-  }
-
-  @SneakyThrows
-  @Override
-  public BlockResponse blockUser(final String targetUserId) {
-    String url = urlHelper.getBlockUserUrl(getUserIdFromAccessToken());
-    return getRequestHelper()
-        .makeRequest(Verb.POST,
-                     url,
-                     new HashMap<>(),
-                     JsonHelper.toJson(new FollowBody(targetUserId)),
-                     true,
-                     BlockResponse.class)
-        .orElseThrow(NoSuchElementException::new);
-  }
-
-  @Override
-  public BlockResponse unblockUser(final String targetUserId) {
-    String url = urlHelper.getUnblockUserUrl(getUserIdFromAccessToken(), targetUserId);
-    return getRequestHelper().makeRequest(Verb.DELETE, url, new HashMap<>(), null, true, BlockResponse.class)
-                             .orElseThrow(NoSuchElementException::new);
-  }
-
-  @Override
-  public UserList getBlockedUsers() {
-    String              url        = urlHelper.getBlockingUsersUrl(getUserIdFromAccessToken());
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(USER_FIELDS, ALL_USER_FIELDS);
-    return getRequestHelper().getRequestWithParameters(url, parameters, UserList.class).orElseThrow(NoSuchElementException::new);
-  }
-
-  @Override
-  public User getUserFromUserId(String userId) {
-    String              url        = getUrlHelper().getUserUrl(userId);
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(USER_FIELDS, ALL_USER_FIELDS);
-    parameters.put(EXPANSION, PINNED_TWEET_ID);
-    return getRequestHelper().getRequestWithParameters(url, parameters, UserV2.class).orElseThrow(NoSuchElementException::new);
-  }
-
-  @Override
-  public UserV2 getUserFromUserName(String userName) {
-    String              url        = getUrlHelper().getUserUrlFromName(userName);
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(USER_FIELDS, ALL_USER_FIELDS);
-    parameters.put(EXPANSION, PINNED_TWEET_ID);
-    return getRequestHelper().getRequestWithParameters(url, parameters, UserV2.class).orElseThrow(NoSuchElementException::new);
-  }
-
-  @Override
-  public List<User> getUsersFromUserNames(List<String> userNames) {
-    String              url        = getUrlHelper().getUsersByUrl();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(USER_FIELDS, ALL_USER_FIELDS);
-    parameters.put(EXPANSION, PINNED_TWEET_ID);
-    StringBuilder names = new StringBuilder();
-    int           i     = 0;
-    while (i < userNames.size() && i < URLHelper.MAX_LOOKUP) {
-      String name = userNames.get(i);
-      names.append(name);
-      names.append(",");
-      i++;
-    }
-    names.delete(names.length() - 1, names.length());
-    parameters.put("usernames", names.toString());
-    List<UserData> result = getRequestHelper().getRequestWithParameters(url, parameters, UserList.class)
-                                              .orElseThrow(NoSuchElementException::new).getData();
-    return result.stream().map(userData -> UserV2.builder().data(userData).build()).collect(Collectors.toList());
-  }
-
-  @Override
-  public List<User> getUsersFromUserIds(List<String> userIds) {
-    String              url        = getUrlHelper().getUsersUrl();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(USER_FIELDS, ALL_USER_FIELDS);
-    parameters.put(EXPANSION, PINNED_TWEET_ID);
-    StringBuilder names = new StringBuilder();
-    int           i     = 0;
-    while (i < userIds.size() && i < URLHelper.MAX_LOOKUP) {
-      String name = userIds.get(i);
-      names.append(name);
-      names.append(",");
-      i++;
-    }
-    names.delete(names.length() - 1, names.length());
-    parameters.put("ids", names.toString());
-    List<UserData> result = getRequestHelper().getRequestWithParameters(url, parameters, UserList.class)
-                                              .orElseThrow(NoSuchElementException::new).getData();
-    return result.stream().map(userData -> UserV2.builder().data(userData).build()).collect(Collectors.toList());
-  }
-
-  @Override
-  public RateLimitStatus getRateLimitStatus() {
-    String url = URLHelper.RATE_LIMIT_URL;
-    return getRequestHelper().getRequest(url, RateLimitStatus.class).orElseThrow(NoSuchElementException::new);
-  }
-
-  @Override
-  public LikeResponse likeTweet(String tweetId) {
-    String url = getUrlHelper().getLikeUrl(getUserIdFromAccessToken());
-    return getRequestHelperV1().postRequestWithBodyJson(url, new HashMap<>(), "{\"tweet_id\":\"" + tweetId + "\"}", LikeResponse.class)
-                               .orElseThrow(NoSuchElementException::new);
-  }
-
-  @Override
-  public LikeResponse unlikeTweet(String tweetId) {
-    String url = getUrlHelper().getUnlikeUrl(getUserIdFromAccessToken(), tweetId);
-    return getRequestHelper()
-        .makeRequest(Verb.DELETE, url, new HashMap<>(), null, true, LikeResponse.class)
-        .orElseThrow(NoSuchElementException::new);
-  }
-
-  @Override
-  public UserList getRetweetingUsers(String tweetId, int maxResults) {
-    String              url        = urlHelper.getRetweetersUrl(tweetId);
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(USER_FIELDS, ALL_USER_FIELDS);
-    parameters.put(EXPANSION, PINNED_TWEET_ID);
-    return getUsersRecursively(maxResults, url, parameters);
-  }
-
-  // @todo see if it cannot be mixed with other similar function
-
-  /**
-   * Used for get liking users, get retweeting users and get members endpoints recursively calls
-   */
-  private UserList getUsersRecursively(int maxResults, String url, Map<String, String> parameters) {
-    UserList result = UserList.builder().meta(new UserMeta()).build();
-    String   next;
-
-    do {
-      parameters.put(MAX_RESULTS, String.valueOf(Math.min(100, maxResults - result.getData().size())));
-      Optional<UserList> userList = getRequestHelper().getRequestWithParameters(url, parameters, UserList.class);
-      if (!userList.isPresent() || userList.get().getData() == null) {
-        result.getMeta().setNextToken(null);
-        break;
-      }
-      result.getData().addAll(userList.get().getData());
-
-      UserMeta meta = UserMeta.builder()
-                              .resultCount(result.getData().size())
-                              .nextToken(userList.get().getMeta().getNextToken())
-                              .build();
-      result.setMeta(meta);
-      next = userList.get().getMeta().getNextToken();
-      parameters.put(AdditionalParameters.PAGINATION_TOKEN, next);
-    } while (next != null && result.getData().size() < maxResults);
-
-    return result;
-  }
+bEnd
+Void
+Delete
+Close
+Stop
 
 
-  @Override
-  public UserList getRetweetingUsers(String tweetId) {
-    return getRetweetingUsers(tweetId, Integer.MAX_VALUE);
-  }
 
-  @Override
-  public UserList getLikingUsers(final String tweetId, int maxResults) {
-    String              url        = getUrlHelper().getLikingUsersUrl(tweetId);
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(USER_FIELDS, ALL_USER_FIELDS);
-    parameters.put(EXPANSION, PINNED_TWEET_ID);
-    return getUsersRecursively(maxResults, url, parameters);
-  }
 
-  @Override
-  public UserList getLikingUsers(final String tweetId) {
-    return getLikingUsers(tweetId, Integer.MAX_VALUE);
-  }
 
-  @Override
-  public TweetList getLikedTweets(final String userId) {
-    return getLikedTweets(userId, AdditionalParameters.builder().maxResults(100).build());
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   @Override
   public TweetList getLikedTweets(final String userId, AdditionalParameters additionalParameters) {
