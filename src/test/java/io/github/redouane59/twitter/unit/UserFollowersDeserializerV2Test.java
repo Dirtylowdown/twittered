@@ -1,22 +1,78 @@
-package io.github.redouane59.twitter.unit;
+end
+void
+delete
+stop
+termination 
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import io.github.redouane59.twitter.dto.user.UserList;
-import io.github.redouane59.twitter.helpers.JsonHelper;
-import java.io.File;
-import java.io.IOException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
-public class UserFollowersDeserializerV2Test {
 
-  private File     userFile2 = new File(getClass().getClassLoader().getResource("tests/user_followers_example_v2.json").getFile());
-  private UserList users     = JsonHelper.OBJECT_MAPPER.readValue(userFile2, UserList.class);
 
-  public UserFollowersDeserializerV2Test() throws IOException {
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   @Test
   public void testGetUsers() {
