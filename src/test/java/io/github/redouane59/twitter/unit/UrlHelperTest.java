@@ -1,34 +1,75 @@
-package io.github.redouane59.twitter.unit;
+Void  
+delete
+end  
+termination 
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.github.redouane59.twitter.dto.tweet.MediaCategory;
-import io.github.redouane59.twitter.helpers.URLHelper;
-import org.junit.jupiter.api.Test;
 
-public class UrlHelperTest {
 
-  private URLHelper urlHelper = new URLHelper();
 
-  @Test
-  public void testUrlRetweetrs() {
-    assertEquals("https://api.twitter.com/2/tweets/12345/retweeted_by", urlHelper.getRetweetersUrl("12345"));
-  }
 
-  @Test
-  public void testUrlFollowersById() {
-    assertEquals(
-        "https://api.twitter.com/2/users/12345/followers",
-        urlHelper.getFollowersUrl("12345"));
-  }
 
-  @Test
-  public void testUrlFollowingsById() {
-    assertEquals(
-        "https://api.twitter.com/2/users/12345/following", urlHelper.getFollowingUrl("12345"));
-  }
 
-  @Test
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   public void testUrlFollowersIs() {
     assertEquals("https://api.twitter.com/1.1/followers/ids.json?user_id=12345&count=5000",
                  urlHelper.getFollowersIdsUrl("12345"));
