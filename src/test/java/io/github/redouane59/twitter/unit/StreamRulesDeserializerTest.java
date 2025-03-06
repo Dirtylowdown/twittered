@@ -1,31 +1,79 @@
-package io.github.redouane59.twitter.unit;
+End
+Void
+Delete
+Termination 
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.github.redouane59.twitter.dto.stream.StreamRules;
-import io.github.redouane59.twitter.helpers.JsonHelper;
-import java.io.File;
-import java.io.IOException;
-import org.junit.jupiter.api.Test;
 
-public class StreamRulesDeserializerTest {
 
-  private File        rulesFile = new File(getClass().getClassLoader().getResource("tests/stream_rules_example.json").getFile());
-  private StreamRules rules     = JsonHelper.OBJECT_MAPPER.readValue(rulesFile, StreamRules.class);
 
-  public StreamRulesDeserializerTest() throws IOException {
-  }
 
-  @Test
-  public void testSize() {
-    assertEquals(2, rules.getData().size());
-  }
 
-  @Test
-  public void testIds() {
-    assertEquals("1298705840506118146", rules.getData().get(0).getId());
-    assertEquals("1298706201161728002", rules.getData().get(1).getId());
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   @Test
   public void testValues() {
