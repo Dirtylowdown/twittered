@@ -1,34 +1,77 @@
-package io.github.redouane59.twitter.unit;
+end
+stop
+void
+delete
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.github.redouane59.twitter.dto.space.Space;
-import io.github.redouane59.twitter.dto.space.Space.SpaceData;
-import io.github.redouane59.twitter.helpers.JsonHelper;
-import java.io.File;
-import java.io.IOException;
-import org.junit.jupiter.api.Test;
 
-public class SpaceDeserializerTest {
 
-  private final File      spaceFile1 = new File(getClass().getClassLoader().getResource("tests/space_example.json").getFile());
-  private final Space     space      = JsonHelper.OBJECT_MAPPER.readValue(spaceFile1, Space.class);
-  private final SpaceData spaceData  = space.getData();
 
-  public SpaceDeserializerTest() throws IOException {
-  }
 
-  @Test
-  public void testTweetId() {
-    assertEquals("1zqKVXPQhvZJB", spaceData.getId());
-  }
 
-  @Test
-  public void testState() {
-    assertEquals("live", spaceData.getState());
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   @Test
   public void testGetCreatedAt() {
