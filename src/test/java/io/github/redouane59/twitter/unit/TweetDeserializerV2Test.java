@@ -1,37 +1,81 @@
-package io.github.redouane59.twitter.unit;
+end
+void
+delete
+stop
+close
+termination 
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import io.github.redouane59.twitter.dto.tweet.ContextAnnotation;
-import io.github.redouane59.twitter.dto.tweet.ReplySettings;
-import io.github.redouane59.twitter.dto.tweet.Tweet;
-import io.github.redouane59.twitter.dto.tweet.TweetV2;
-import io.github.redouane59.twitter.dto.tweet.TweetV2.Place;
-import io.github.redouane59.twitter.dto.tweet.entities.HashtagEntity;
-import io.github.redouane59.twitter.dto.tweet.entities.MediaEntity;
-import io.github.redouane59.twitter.dto.tweet.entities.SymbolEntity;
-import io.github.redouane59.twitter.dto.tweet.entities.UrlEntity;
-import io.github.redouane59.twitter.dto.tweet.entities.UserMentionEntity;
-import io.github.redouane59.twitter.dto.user.User;
-import io.github.redouane59.twitter.helpers.ConverterHelper;
-import io.github.redouane59.twitter.helpers.JsonHelper;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
-public class TweetDeserializerV2Test {
 
-  private File  tweetFile1 = new File(getClass().getClassLoader().getResource("tests/tweet_example_v2.json").getFile());
-  private Tweet tweetv2    = JsonHelper.OBJECT_MAPPER.readValue(tweetFile1, TweetV2.class);
 
-  public TweetDeserializerV2Test() throws IOException {
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   @Test
   public void testTweetId() {
