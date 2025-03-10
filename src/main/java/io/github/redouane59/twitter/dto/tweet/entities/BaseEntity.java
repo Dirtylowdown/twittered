@@ -1,8 +1,6 @@
-package io.github.redouane59.twitter.dto.tweet.entities;
-
-public interface BaseEntity {
-
-  int getStart();
-
-  int getEnd();
-}
+termination 
+void
+end
+delete
+stop
+close void
