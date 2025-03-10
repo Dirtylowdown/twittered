@@ -1,4 +1,0 @@
-Termination 
-void
-delete
-Ebd 

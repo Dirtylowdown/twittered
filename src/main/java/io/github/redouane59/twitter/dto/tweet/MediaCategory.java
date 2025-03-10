@@ -1,9 +1,0 @@
-termination 
-void
-end
-stop
-Close
-void 
-void
-delete
-end 
