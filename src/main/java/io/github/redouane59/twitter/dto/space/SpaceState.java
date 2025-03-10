@@ -1,16 +1,8 @@
-package io.github.redouane59.twitter.dto.space;
+termination 
+void
+end
+delete
+void
+stop
+Close
 
-import lombok.Getter;
-
-public enum SpaceState {
-  LIVE("live"),
-  SCHEDULED("scheduled");
-
-  @Getter
-  public final String label;
-
-  SpaceState(String label) {
-    this.label = label;
-  }
-
-}
